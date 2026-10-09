@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net: Default-deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // User Profile Validation
+    function isValidUserProfile(data) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.visitedDistricts is list &&
+             data.visitedDistricts.size() <= 64 &&
+             (!('travelerName' in data) || (data.travelerName is string && data.travelerName.size() <= 100)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+             (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 2048)) &&
+             (!('themeId' in data) || (data.themeId in ['emerald', 'navy', 'coral', 'cyan', 'forest'])) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+    }
+
+    // Shared Map Validation
+    function isValidSharedMap(data) {
+      return data.id is string &&
+             data.id.size() <= 128 &&
+             data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.visitedDistricts is list &&
+             data.visitedDistricts.size() <= 64 &&
+             data.themeId in ['emerald', 'navy', 'coral', 'cyan', 'forest'] &&
+             (!('travelerName' in data) || (data.travelerName is string && data.travelerName.size() <= 100)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
+    }
+
+    // Collection: Users (Strictly isolated by Auth UID)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false; // Disallow querying across all users
+      allow create: if isValidId(userId) && isOwner(userId) && isValidUserProfile(incoming());
+      allow update: if isValidId(userId) && isOwner(userId) && isValidUserProfile(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isValidId(userId) && isOwner(userId);
+    }
+
+    // Collection: Public Shared Maps
+    match /shared_maps/{mapId} {
+      allow read: if isValidId(mapId);
+      allow create: if isSignedIn() && isValidId(mapId) && isValidSharedMap(incoming());
+      allow update: if isSignedIn() && isValidId(mapId) && existing().userId == request.auth.uid && incoming().userId == existing().userId && isValidSharedMap(incoming());
+      allow delete: if isSignedIn() && isValidId(mapId) && existing().userId == request.auth.uid;
+    }
+
+  }
+}

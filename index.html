@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Compatibility safeguard for browser extensions attempting to assign window.fetch
+      (function() {
+        try {
+          var _origFetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return _origFetch; },
+            set: function(fn) { _origFetch = fn; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          // Fallback if property definition fails
+        }
+      })();
+    </script>
+    <title>Ochena Bangla - অচেনা বাংলা | বাংলাদেশ ভ্রমণ ম্যাপ</title>
+    <meta name="description" content="ইন্টারেক্টিভ বাংলাদেশ জেলা ভ্রমণ ম্যাপ ও ট্রাভেলার ট্র্যাকার" />
+    <meta property="og:title" content="Ochena Bangla - অচেনা বাংলা | বাংলাদেশ ভ্রমণ ম্যাপ" />
+    <meta property="og:description" content="ইন্টারেক্টিভ বাংলাদেশ জেলা ভ্রমণ ম্যাপ ও ট্রাভেলার ট্র্যাকার" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#fcfaf6] text-[#18231c] font-['Hind_Siliguri',sans-serif] antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

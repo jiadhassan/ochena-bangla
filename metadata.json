@@ -1,0 +1,6 @@
+{
+  "name": "Ochena Bangla - অচেনা বাংলা",
+  "description": "ইন্টারেক্টিভ বাংলাদেশ জেলা ভ্রমণ ম্যাপ ও ট্রাভেলার ট্র্যাকার",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

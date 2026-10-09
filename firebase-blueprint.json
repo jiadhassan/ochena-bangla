@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User profile with saved travel map progress and preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier of the user matching auth UID",
+          "maxLength": 128
+        },
+        "travelerName": {
+          "type": "string",
+          "description": "Name of the traveler",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the traveler",
+          "maxLength": 150
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to profile photo",
+          "maxLength": 2048
+        },
+        "visitedDistricts": {
+          "type": "array",
+          "description": "List of district IDs visited",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "themeId": {
+          "type": "string",
+          "description": "Preferred map theme color ID",
+          "enum": ["emerald", "navy", "coral", "cyan", "forest"]
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["userId", "visitedDistricts"]
+    },
+    "sharedMap": {
+      "title": "SharedMap",
+      "description": "Publicly viewable travel map card record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique share ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner auth UID",
+          "maxLength": 128
+        },
+        "travelerName": {
+          "type": "string",
+          "description": "Name of the traveler displayed on the shared map",
+          "maxLength": 100
+        },
+        "visitedDistricts": {
+          "type": "array",
+          "description": "List of visited district IDs",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        },
+        "themeId": {
+          "type": "string",
+          "description": "Selected theme ID",
+          "enum": ["emerald", "navy", "coral", "cyan", "forest"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        }
+      },
+      "required": ["id", "userId", "visitedDistricts", "themeId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User specific private profile and saved district tracker data"
+    },
+    "/shared_maps/{mapId}": {
+      "schema": "sharedMap",
+      "description": "Public travel map records for sharing"
+    }
+  }
+}
